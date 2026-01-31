@@ -51,3 +51,29 @@ export interface AttendanceRecord {
     notes?: string;
     created_at?: string;
 }
+
+export interface Transaction {
+    id?: string;
+    amount: number;
+    type: 'income' | 'expense';
+    category: string;
+    description?: string;
+    date: string;
+    paymentMethod?: string;
+    player_id?: string;
+}
+
+export interface ClinicStats {
+    clinic: string;
+    activePlayers: number;
+    totalRevenue: number;
+    pendingRevenue: number;
+}
+
+export interface DashboardStats {
+    confirmedRevenue: number;
+    pendingRevenue: number;
+    activePlayers: number;
+    activeScholarships: number;
+    clinicStats: ClinicStats[];
+}

@@ -5,7 +5,8 @@ import { DollarSign, Search, CheckCircle, Clock, AlertCircle, Loader2 } from 'lu
 import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { payInvoice, updateInvoice } from '@/actions/finance';
-import { invoicesService, Invoice } from '@/services/invoices';
+import { fetchInvoicesAction } from '@/actions/client_data';
+import { Invoice } from '@/types/bookings';
 import { EditInvoiceModal } from '@/components/payments/EditInvoiceModal';
 import { Edit2 } from 'lucide-react';
 
@@ -18,8 +19,11 @@ export default function PaymentsPage() {
 
     const fetchInvoices = async () => {
         setLoading(true);
-        const data = await invoicesService.getInvoices();
-        setInvoices(data);
+        // Use Server Action
+        const data = await fetchInvoicesAction();
+        // data comes from invoicesService.getInvoices() which returns items with player_name
+        // Mapping might be needed if types mismatch, but Invoice type should match reasonably well.
+        setInvoices(data as Invoice[]);
         setLoading(false);
     };
 

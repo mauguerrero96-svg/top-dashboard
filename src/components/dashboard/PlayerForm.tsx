@@ -2,7 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { DashboardPlayer, PlayerStatus, PaymentStatus, ClinicType, PaymentRecord } from '@/types/dashboard';
-import { dashboardService } from '@/services/dashboard';
+import {
+    fetchPlayerPaymentsAction,
+    addPaymentAction,
+    createPlayerAction,
+    updatePlayerAction,
+    deletePaymentAction
+} from '@/actions/client_data';
 import { Loader2, Plus, DollarSign, History, Trash2 } from 'lucide-react';
 
 interface PlayerFormProps {
@@ -42,15 +48,15 @@ export function PlayerForm({ player, onSuccess, onCancel }: PlayerFormProps) {
 
     const loadPayments = async () => {
         if (!player?.id) return;
-        const history = await dashboardService.getPlayerPayments(player.id);
-        setPaymentHistory(history);
+        const history = await fetchPlayerPaymentsAction(player.id);
+        setPaymentHistory(history as PaymentRecord[]);
     };
 
     const handleAddPayment = async () => {
         if (paymentAmount <= 0 || !player?.id) return;
         setPaymentLoading(true);
         try {
-            const success = await dashboardService.addPayment(player.id, paymentAmount, 'Abono manual');
+            const success = await addPaymentAction(player.id, paymentAmount, 'Abono manual');
             if (success) {
                 setPaymentAmount(0);
                 loadPayments();
@@ -67,9 +73,9 @@ export function PlayerForm({ player, onSuccess, onCancel }: PlayerFormProps) {
         try {
             let success = false;
             if (isEditing && player?.id) {
-                success = await dashboardService.updatePlayer(player.id, formData);
+                success = await updatePlayerAction(player.id, formData);
             } else {
-                success = await dashboardService.createPlayer(formData);
+                success = await createPlayerAction(formData);
             }
 
             if (success) {
@@ -242,7 +248,7 @@ export function PlayerForm({ player, onSuccess, onCancel }: PlayerFormProps) {
                                                 type="button"
                                                 onClick={async () => {
                                                     if (confirm('¿Eliminar este pago?')) {
-                                                        const ok = await dashboardService.deletePayment(pay.id, player!.id);
+                                                        const ok = await deletePaymentAction(pay.id, player!.id);
                                                         if (ok) {
                                                             loadPayments();
                                                             onSuccess();

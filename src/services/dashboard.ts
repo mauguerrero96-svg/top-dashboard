@@ -1,21 +1,6 @@
 import { supabaseServer as supabase } from '@/lib/supabaseServer';
 import { startOfMonth, endOfMonth } from 'date-fns';
-import { DashboardPlayer, DashboardPayment, PaymentRecord } from '@/types/dashboard';
-
-export interface ClinicStats {
-    clinic: string;
-    activePlayers: number;
-    totalRevenue: number;
-    pendingRevenue: number;
-}
-
-export interface DashboardStats {
-    confirmedRevenue: number;
-    pendingRevenue: number;
-    activePlayers: number;
-    activeScholarships: number;
-    clinicStats: ClinicStats[];
-}
+import { DashboardPlayer, DashboardPayment, PaymentRecord, ClinicStats, DashboardStats } from '@/types/dashboard';
 
 export const dashboardService = {
     /**

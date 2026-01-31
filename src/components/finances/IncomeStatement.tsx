@@ -5,7 +5,13 @@ import { Card } from '@/components/ui/Card';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import { TrendingDown, TrendingUp, Wallet, Plus, ChevronLeft, ChevronRight, Calendar as CalendarIcon, Loader2, Trash2, Edit, Download } from 'lucide-react';
 import { AddTransactionModal } from '@/components/reports/AddTransactionModal';
-import { financesService, Transaction } from '@/services/finances';
+import {
+    fetchTransactionsAction,
+    deleteTransactionAction,
+    updateTransactionAction
+} from '@/actions/client_data';
+import { addTransaction } from '@/actions/finance';
+import { Transaction } from '@/types/dashboard';
 import { format, startOfMonth, endOfMonth, subMonths, addMonths, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 
@@ -28,7 +34,7 @@ export function IncomeStatement() {
         setLoading(true);
         const start = startOfMonth(selectedMonth);
         const end = endOfMonth(selectedMonth);
-        const data = await financesService.getTransactions(start, end);
+        const data = await fetchTransactionsAction(start, end);
         setTransactions(data);
         setLoading(false);
     }, [selectedMonth]);
@@ -68,55 +74,68 @@ export function IncomeStatement() {
         return Array.from(map.entries()).map(([name, value]) => ({ name, value }));
     }, [expenseTransactions]);
 
-    // 3. Handle New/Edit Transaction
-    const handleAddTransaction = async (data: any) => {
-        if (editingTransaction) {
-            // Update
-            const updatedTransaction: Transaction = {
+    // 3. Handle Transaction (Add / Edit)
+    const handleSaveTransaction = async (data: any) => {
+        if (editingTransaction && editingTransaction.id) {
+            // Edit Mode
+            const updatedTx: Transaction = {
                 ...editingTransaction,
                 date: data.date,
                 amount: data.amount,
                 type: data.type.toLowerCase() as 'income' | 'expense',
                 category: data.category,
-                description: data.description,
+                description: data.description || '',
             };
 
-            const ok = await financesService.updateTransaction(updatedTransaction);
-            if (ok) {
+            const success = await updateTransactionAction(updatedTx);
+            if (success) {
                 fetchData();
                 setIsModalOpen(false);
                 setEditingTransaction(null);
             } else {
-                alert('Error al actualizar la transacción');
+                alert('Error al actualizar');
             }
         } else {
-            // Create
-            const newTransaction: Transaction = {
+            // Create Mode
+            const newTransaction = {
                 date: data.date,
                 amount: data.amount,
                 type: data.type.toLowerCase() as 'income' | 'expense',
                 category: data.category,
-                description: data.description,
-                paymentMethod: 'Manual', // Defaulting for now
+                description: data.description || '',
+                player_id: undefined,
             };
 
-            const saved = await financesService.addTransaction(newTransaction);
-            if (saved) {
-                fetchData(); // Refresh list
+            const result = await addTransaction(newTransaction);
+            if (result && result.success) {
+                fetchData();
                 setIsModalOpen(false);
             } else {
-                alert('Error al guardar la transacción');
+                alert('Error al guardar');
             }
         }
     };
 
-    const openCreateModal = () => {
-        setEditingTransaction(null);
-        setIsModalOpen(true);
+    const handleDelete = async (t: Transaction) => {
+        if (!confirm('¿Estás seguro de eliminar esta transacción?')) return;
+        if (!t.id) return;
+
+        // Pass extra params if relevant (sourceTable, playerId) which might be on Transaction object from fetching
+        const success = await deleteTransactionAction(t.id, t.type, (t as any).sourceTable, t.player_id);
+        if (success) {
+            fetchData();
+        } else {
+            alert('Error al eliminar');
+        }
     };
 
     const openEditModal = (t: Transaction) => {
         setEditingTransaction(t);
+        setIsModalOpen(true);
+    };
+
+    const openCreateModal = () => {
+        setEditingTransaction(null);
         setIsModalOpen(true);
     };
 
@@ -125,14 +144,14 @@ export function IncomeStatement() {
             <AddTransactionModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
-                onSubmit={handleAddTransaction}
+                onSubmit={handleSaveTransaction}
                 initialData={editingTransaction ? {
                     type: editingTransaction.type === 'income' ? 'Income' : 'Expense',
                     description: editingTransaction.description || '',
                     amount: editingTransaction.amount,
                     category: editingTransaction.category,
                     date: editingTransaction.date
-                } : null}
+                } : undefined}
             />
 
             {/* Header with Month Selector */}
@@ -358,7 +377,8 @@ export function IncomeStatement() {
                                             <th className="pb-4 pl-4">Concepto</th>
                                             <th className="pb-4">Categoría</th>
                                             <th className="pb-4">Fecha</th>
-                                            <th className="pb-4 text-right pr-4">Monto</th>
+                                            <th className="pb-4 text-right">Monto</th>
+                                            <th className="pb-4 pr-4 text-right">Acciones</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-slate-50">
@@ -374,39 +394,23 @@ export function IncomeStatement() {
                                                     </span>
                                                 </td>
                                                 <td className="py-4 text-slate-400 font-mono">{format(parseISO(t.date), 'd MMM yyyy', { locale: es })}</td>
-                                                <td className={`py-4 pr-4 text-right font-bold ${t.type === 'income' ? 'text-emerald-600' : 'text-rose-600'}`}>
-                                                    <div className="flex items-center justify-end gap-3">
-                                                        <span>{t.type === 'income' ? '+' : '-'}${t.amount.toLocaleString()}</span>
-
-                                                        {/* Edit Button */}
-                                                        {t.paymentMethod !== 'System' && (
-                                                            <button
-                                                                onClick={() => openEditModal(t)}
-                                                                className="opacity-0 group-hover:opacity-100 p-1 text-slate-300 hover:text-indigo-500 transition-all"
-                                                                title="Editar"
-                                                            >
-                                                                <Edit size={16} />
-                                                            </button>
-                                                        )}
-
-                                                        {t.paymentMethod !== 'System' && (
-                                                            <button
-                                                                onClick={async () => {
-                                                                    if (confirm(`¿Eliminar esta transacción? ${t.sourceTable === 'player_payments' ? '\nSe recalculará la deuda del jugador.' : ''}`)) {
-                                                                        const ok = await financesService.deleteTransaction(t.id!, t.type, t.sourceTable, t.playerId);
-                                                                        if (ok) {
-                                                                            fetchData();
-                                                                        } else {
-                                                                            alert('No se puede eliminar esta transacción.');
-                                                                        }
-                                                                    }
-                                                                }}
-                                                                className="opacity-0 group-hover:opacity-100 p-1 text-slate-300 hover:text-red-500 transition-all"
-                                                                title="Eliminar registro"
-                                                            >
-                                                                <Trash2 size={16} />
-                                                            </button>
-                                                        )}
+                                                <td className={`py-4 text-right font-bold ${t.type === 'income' ? 'text-emerald-600' : 'text-rose-600'}`}>
+                                                    {t.type === 'income' ? '+' : '-'}${t.amount.toLocaleString()}
+                                                </td>
+                                                <td className="py-4 pr-4 text-right">
+                                                    <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <button
+                                                            onClick={() => openEditModal(t)}
+                                                            className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-slate-100 rounded-lg transition-colors"
+                                                        >
+                                                            <Edit size={16} />
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleDelete(t)}
+                                                            className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-slate-100 rounded-lg transition-colors"
+                                                        >
+                                                            <Trash2 size={16} />
+                                                        </button>
                                                     </div>
                                                 </td>
                                             </tr>

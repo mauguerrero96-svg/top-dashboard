@@ -6,7 +6,7 @@ import { supabase } from '@/lib/supabase';
 import { X, Loader2, Calendar, DollarSign, CheckCircle, Clock, AlertCircle } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { dashboardService } from '@/services/dashboard';
+import { getAttendanceAction, checkInPlayerAction } from '@/actions/client_data';
 import { AttendanceRecord } from '@/types/dashboard';
 
 import { PlayerForm } from '@/components/dashboard/PlayerForm';
@@ -72,7 +72,7 @@ export function PlayerDetailModal({ player, onClose, onUpdate }: PlayerDetailMod
                 invoicesPromise,
                 schedulesPromise,
                 bookingsPromise,
-                dashboardService.getAttendanceHistory(player.id)
+                getAttendanceAction(player.id)
             ]);
 
             if (invRes.data) setInvoices(invRes.data as Invoice[]);
@@ -88,10 +88,10 @@ export function PlayerDetailModal({ player, onClose, onUpdate }: PlayerDetailMod
 
     const handleCheckIn = async () => {
         setCheckingIn(true);
-        const success = await dashboardService.checkInPlayer(player.id);
+        const success = await checkInPlayerAction(player.id);
         if (success) {
             // Re-fetch attendance
-            const history = await dashboardService.getAttendanceHistory(player.id);
+            const history = await getAttendanceAction(player.id);
             setAttendance(history as AttendanceRecord[]);
             // switch to attendance tab
             setActiveTab('attendance');

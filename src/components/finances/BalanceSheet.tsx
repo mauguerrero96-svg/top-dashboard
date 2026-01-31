@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/Card';
-import { financesService } from '@/services/finances';
+import { fetchBalanceSheetAction } from '@/actions/client_data';
 import { Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -14,7 +14,7 @@ export function BalanceSheet() {
     useEffect(() => {
         const fetchBalance = async () => {
             setLoading(true);
-            const result = await financesService.getBalanceSheet(new Date());
+            const result = await fetchBalanceSheetAction(new Date());
             setData(result);
             setLoading(false);
         };

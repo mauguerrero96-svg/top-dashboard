@@ -5,7 +5,9 @@ import { Card } from '@/components/ui/Card';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import { TrendingDown, TrendingUp, Wallet, Plus, ChevronLeft, ChevronRight, Calendar as CalendarIcon, Loader2 } from 'lucide-react';
 import { AddTransactionModal } from '@/components/reports/AddTransactionModal';
-import { financesService, Transaction } from '@/services/finances';
+import { fetchTransactionsAction } from '@/actions/client_data';
+import { addTransaction } from '@/actions/finance';
+import { Transaction } from '@/types/dashboard';
 import { format, startOfMonth, endOfMonth, subMonths, addMonths, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 
@@ -27,7 +29,7 @@ export default function ReportsPage() {
         setLoading(true);
         const start = startOfMonth(selectedMonth);
         const end = endOfMonth(selectedMonth);
-        const data = await financesService.getTransactions(start, end);
+        const data = await fetchTransactionsAction(start, end);
         setTransactions(data);
         setLoading(false);
     }, [selectedMonth]);
@@ -69,19 +71,19 @@ export default function ReportsPage() {
 
     // 3. Handle New Transaction
     const handleAddTransaction = async (data: any) => {
-        // Convert modal data to Transaction format
+        // Convert modal data to TransactionData format for the action
         // Modal returns: type ('Income'|'Expense'), amount, category, description, date
-        const newTransaction: Transaction = {
+        const newTransaction = {
             date: data.date,
             amount: data.amount,
             type: data.type.toLowerCase() as 'income' | 'expense',
             category: data.category,
-            description: data.description,
-            paymentMethod: 'Manual', // Defaulting for now
+            description: data.description || '', // Ensure string
+            player_id: undefined, // Reports page typically adds general transactions
         };
 
-        const saved = await financesService.addTransaction(newTransaction);
-        if (saved) {
+        const result = await addTransaction(newTransaction);
+        if (result && result.success) {
             fetchData(); // Refresh list
             setIsModalOpen(false);
         } else {

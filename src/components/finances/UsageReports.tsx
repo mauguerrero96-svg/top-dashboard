@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/Card';
-import { dashboardService } from '@/services/dashboard';
+import { fetchUsageStatsAction } from '@/actions/client_data';
 import { Loader2, Users, Trophy, MapPin } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, CartesianGrid, LineChart, Line } from 'recharts';
 import { startOfMonth, endOfMonth, format, parseISO } from 'date-fns';
@@ -19,7 +19,7 @@ export function UsageReports() {
     useEffect(() => {
         const fetchUsage = async () => {
             setLoading(true);
-            const stats = await dashboardService.getUsageStats(dateRange.start, dateRange.end);
+            const stats = await fetchUsageStatsAction(dateRange.start, dateRange.end);
             setData(stats);
             setLoading(false);
         };

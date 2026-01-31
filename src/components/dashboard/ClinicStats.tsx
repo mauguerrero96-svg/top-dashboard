@@ -1,6 +1,6 @@
 'use client';
 
-import { ClinicStats } from '@/services/dashboard';
+import { ClinicStats } from '@/types/dashboard';
 import { Card } from '@/components/ui/Card';
 import { Users, DollarSign, AlertCircle } from 'lucide-react';
 

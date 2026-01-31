@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { X, Save, Loader2 } from 'lucide-react';
-import { Invoice } from '@/services/invoices';
+import { Invoice } from '@/types/bookings';
 
 interface EditInvoiceModalProps {
     isOpen: boolean;

@@ -4,11 +4,10 @@ import { useState, useEffect, useCallback } from 'react';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Search, Filter, Plus, MoreHorizontal, Mail, Phone, Edit2 } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
 import { DashboardPlayer } from '@/types/dashboard';
 import { EditPlayerModal } from '@/components/dashboard/EditPlayerModal';
 import { PlayerDetailModal } from '@/components/dashboard/PlayerDetailModal';
-import { dashboardService } from '@/services/dashboard';
+import { fetchPlayers, fetchAllInvoicesAction } from '@/actions/client_data';
 
 // DB Payment Type
 interface DBPayment {
@@ -44,15 +43,11 @@ export default function PlayersPage() {
     const fetchData = useCallback(async () => {
         setLoading(true);
         try {
-            // Fetch players using dashboardService which returns DashboardPlayer[] (with monthly_fee, etc)
-            const playersData = await dashboardService.getPlayers();
+            // Fetch players using Server Action
+            const playersData = await fetchPlayers();
 
-            // Fetch payments to calculate balance
-            const { data: paymentsData, error: paymentsError } = await supabase
-                .from('invoices') // Use 'invoices' instead of dashboard_payments
-                .select('*');
-
-            if (paymentsError) throw paymentsError;
+            // Fetch payments using Server Action
+            const paymentsData = await fetchAllInvoicesAction();
 
             // Process data
             const processedPlayers = playersData.map(player => {

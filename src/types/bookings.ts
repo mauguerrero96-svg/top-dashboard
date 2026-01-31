@@ -17,12 +17,14 @@ export type InvoiceStatus = 'Paid' | 'Pending' | 'Overdue';
 
 export interface Invoice {
     id: string;
-    playerId: string;
+    serial_id: string;
+    player_id: string; // Database uses snake_case
+    player_name?: string; // Added by service
     amount: number;
     date: string; // ISO date
     status: InvoiceStatus;
     description: string;
-    category: string;
+    category?: string; // Optional in DB usually
 }
 
 export interface Court {
