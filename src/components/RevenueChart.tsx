@@ -46,7 +46,7 @@ export function RevenueChart() {
                     <Tooltip
                         contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                         itemStyle={{ color: '#0f172a', fontWeight: 'bold' }}
-                        formatter={(value: number) => [`$${value}`, 'Ingresos']}
+                        formatter={(value: any) => [`$${value}`, 'Ingresos']}
                     />
                     <Bar
                         dataKey="revenue"

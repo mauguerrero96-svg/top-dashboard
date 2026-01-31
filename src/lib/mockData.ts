@@ -45,6 +45,7 @@ export interface Booking {
   playerName?: string; // Transformed from join
   coachName?: string; // Transformed from join
   participants?: { name: string }[]; // Transformed from join
+  clinic?: string;
 }
 
 export interface Coach {

@@ -35,7 +35,7 @@ async function checkDuplicates() {
     if (!groups.has(key)) {
       groups.set(key, []);
     }
-    groups.get(key).push(inv);
+    groups.get(key)!.push(inv);
   });
 
   let duplicateCount = 0;
