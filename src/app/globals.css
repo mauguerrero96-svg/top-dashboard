@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-heading: 'Outfit', sans-serif;
+
+  /* Modern Palette - Club Ace "Breakpoint" Theme */
+  --color-accent: #84cc16;
+  /* Lime-500 */
+  --color-slate-900: #0f172a;
+
+  --radius-3xl: 2rem;
+  /* 32px */
+}
+
+/* Custom Utilities mimicking the "Bubble" look */
+.card-hover {
+  @apply transition-all duration-300 hover:shadow-2xl hover:shadow-lime-500/10 hover:-translate-y-1;
+}
+
+/* Global Reset & Typography */
+body {
+  background-color: #f8fafc;
+  color: #0f172a;
+  font-family: var(--font-sans);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
+  letter-spacing: -0.025em;
+}
+
+/* Premium Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 99px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
