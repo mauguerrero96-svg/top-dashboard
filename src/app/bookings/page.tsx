@@ -3,13 +3,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Card } from '@/components/ui/Card';
 import { Booking, Coach, Court } from '@/types/bookings';
-import { bookingsService } from '@/services/bookings';
+import { fetchBookings, fetchPlayers, fetchCoaches, fetchCourts, createBookingAction, updateBookingAction } from '@/actions/client_data';
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock, User, Plus, Loader2 } from 'lucide-react';
 import { format, addDays, isSameDay, parseISO, getHours, getMinutes, differenceInMinutes, startOfDay, endOfDay } from 'date-fns';
 import { es } from 'date-fns/locale';
 import clsx from 'clsx';
 import { CreateBookingModal } from '@/components/CreateBookingModal';
-import { dashboardService } from '@/services/dashboard';
 import { DashboardPlayer } from '@/types/dashboard';
 
 const START_HOUR = 7;
@@ -35,10 +34,10 @@ export default function BookingsPage() {
         const end = endOfDay(selectedDate);
 
         const [bookingsData, playersData, coachesData, courtsData] = await Promise.all([
-            bookingsService.getBookings(start, end),
-            dashboardService.getPlayers(),
-            bookingsService.getCoaches(),
-            bookingsService.getCourts()
+            fetchBookings(start, end),
+            fetchPlayers(),
+            fetchCoaches(),
+            fetchCourts()
         ]);
 
         setBookings(bookingsData);
@@ -64,8 +63,7 @@ export default function BookingsPage() {
         // Pass full booking data to modal
         // We need to reconstruct the object expected by the modal
         setIsModalOpen(true);
-        // We'll store the booking to be edited in state (reusing newBookingData or a new state)
-        // For simplicity, let's add a state for "editingBooking"
+        setEditingBooking(booking);
     };
 
     const [editingBooking, setEditingBooking] = useState<any>(null);
@@ -111,7 +109,7 @@ export default function BookingsPage() {
         }
 
         // Call Service
-        const newBooking = await bookingsService.createBooking({
+        const newBooking = await createBookingAction({
             courtId: court.id,
             startTime: start.toISOString(),
             endTime: end.toISOString(),
@@ -156,7 +154,7 @@ export default function BookingsPage() {
             const newDuration = parseFloat(bookingDetails.duration);
             const newEnd = new Date(currentStart.getTime() + newDuration * 60 * 60 * 1000);
 
-            const updated = await bookingsService.updateBooking(editingBooking.id, {
+            const updated = await updateBookingAction(editingBooking.id, {
                 ...bookingDetails,
                 startTime: currentStart.toISOString(),
                 endTime: newEnd.toISOString()
@@ -237,7 +235,7 @@ export default function BookingsPage() {
         setBookings(bookings.map(b => b.id === bookingId ? updatedBooking : b));
 
         // Persist
-        const result = await bookingsService.updateBooking(bookingId, {
+        const result = await updateBookingAction(bookingId, {
             courtId,
             startTime: newStart.toISOString(),
             endTime: newEnd.toISOString()
