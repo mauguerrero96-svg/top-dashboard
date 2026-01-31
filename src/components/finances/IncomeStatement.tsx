@@ -21,8 +21,11 @@ const COLORS = {
     expense: ['#ef4444', '#f97316', '#eab308', '#64748b', '#06b6d4'], // Red, Orange, Yellow, Slate, Cyan
 };
 
+import { CategoryDetailsModal } from '@/components/finances/CategoryDetailsModal';
+
 export function IncomeStatement() {
     // --- State ---
+    const [selectedCategory, setSelectedCategory] = useState<{ name: string, type: 'income' | 'expense', value: number } | null>(null);
     const [selectedMonth, setSelectedMonth] = useState(new Date());
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [loading, setLoading] = useState(true);
@@ -293,9 +296,22 @@ export function IncomeStatement() {
                                                     outerRadius={100}
                                                     paddingAngle={5}
                                                     dataKey="value"
+                                                    onClick={(data, index) => {
+                                                        setSelectedCategory({
+                                                            name: data.name,
+                                                            type: 'income',
+                                                            value: data.value
+                                                        });
+                                                    }}
+                                                    className="cursor-pointer outline-none active:outline-none"
                                                 >
                                                     {incomeByCat.map((entry, index) => (
-                                                        <Cell key={`cell-${index}`} fill={COLORS.income[index % COLORS.income.length]} stroke="none" />
+                                                        <Cell
+                                                            key={`cell-${index}`}
+                                                            fill={COLORS.income[index % COLORS.income.length]}
+                                                            stroke="none"
+                                                            className="hover:opacity-80 transition-opacity cursor-pointer"
+                                                        />
                                                     ))}
                                                 </Pie>
                                                 <Tooltip
@@ -326,9 +342,22 @@ export function IncomeStatement() {
                                                         outerRadius={100}
                                                         paddingAngle={5}
                                                         dataKey="value"
+                                                        onClick={(data, index) => {
+                                                            setSelectedCategory({
+                                                                name: data.name,
+                                                                type: 'expense',
+                                                                value: data.value
+                                                            });
+                                                        }}
+                                                        className="cursor-pointer outline-none active:outline-none"
                                                     >
                                                         {expenseByCat.map((entry, index) => (
-                                                            <Cell key={`cell-${index}`} fill={COLORS.expense[index % COLORS.expense.length]} stroke="none" />
+                                                            <Cell
+                                                                key={`cell-${index}`}
+                                                                fill={COLORS.expense[index % COLORS.expense.length]}
+                                                                stroke="none"
+                                                                className="hover:opacity-80 transition-opacity cursor-pointer"
+                                                            />
                                                         ))}
                                                     </Pie>
                                                     <Tooltip
@@ -432,6 +461,17 @@ export function IncomeStatement() {
                     )}
                 </>
             )}
+            {/* Expense Breakdown */}
+            {/* Same logic can be applied to expense chart if it exists, or just keep it for income as requested */}
+
+            <CategoryDetailsModal
+                isOpen={!!selectedCategory}
+                onClose={() => setSelectedCategory(null)}
+                category={selectedCategory?.name || ''}
+                type={selectedCategory?.type || 'income'}
+                transactions={transactions}
+                total={selectedCategory?.value || 0}
+            />
         </div>
     );
 }
