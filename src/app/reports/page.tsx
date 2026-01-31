@@ -100,23 +100,23 @@ export default function ReportsPage() {
             />
 
             {/* Header with Month Selector */}
-            <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-6">
+            <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-6 bg-slate-50 p-4 md:p-6 rounded-2xl border border-slate-100 transition-all">
                 <div>
-                    <h1 className="text-3xl font-extrabold text-slate-900 mb-2">Reportes Financieros</h1>
-                    <p className="text-slate-500 font-medium">Análisis detallado de Ingresos y Egresos por mes.</p>
+                    <h3 className="text-xl font-bold text-slate-800">Reportes Financieros</h3>
+                    <p className="text-slate-500 text-sm">Resumen mensual de ingresos y egresos.</p>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center">
+                <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
                     {/* Month Selector */}
-                    <div className="flex items-center bg-white rounded-xl border border-slate-200 p-1 shadow-sm">
+                    <div className="flex items-center justify-between bg-white rounded-xl border border-slate-200 p-1 shadow-sm">
                         <button
                             onClick={() => handleMonthChange('prev')}
                             className="p-2 hover:bg-slate-100 rounded-lg text-slate-600 transition-colors"
                         >
                             <ChevronLeft size={20} />
                         </button>
-                        <div className="px-6 text-slate-800 font-bold flex items-center gap-2 min-w-[200px] justify-center text-lg">
-                            <CalendarIcon size={18} className="text-emerald-500" />
+                        <div className="px-4 text-slate-800 font-bold flex items-center justify-center gap-2 min-w-[150px] text-sm md:text-lg">
+                            <CalendarIcon size={16} className="text-emerald-500" />
                             <span className="capitalize">{format(selectedMonth, 'MMMM yyyy', { locale: es })}</span>
                         </div>
                         <button
@@ -197,9 +197,9 @@ export default function ReportsPage() {
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
                             {/* Income Breakdown */}
-                            <Card title="Fuentes de Ingreso" description="Desglose por categoría" className="lg:col-span-1 min-h-[400px]">
+                            <Card title="Fuentes de Ingreso" description="Desglose por categoría" className="lg:col-span-1 min-h-[300px] md:min-h-[400px]">
                                 {incomeByCat.length > 0 ? (
-                                    <div className="h-[300px] w-full">
+                                    <div className="h-[250px] md:h-[300px] w-full">
                                         <ResponsiveContainer width="100%" height="100%">
                                             <PieChart>
                                                 <Pie

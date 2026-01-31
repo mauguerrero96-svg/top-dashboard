@@ -155,23 +155,23 @@ export function IncomeStatement() {
             />
 
             {/* Header with Month Selector */}
-            <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-6 bg-slate-50 p-6 rounded-2xl border border-slate-100">
+            <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-6 bg-slate-50 p-4 md:p-6 rounded-2xl border border-slate-100 transition-all">
                 <div>
-                    <h3 className="text-xl font-bold text-slate-800">Estado de Resultados Mensual</h3>
+                    <h3 className="text-xl font-bold text-slate-800">Estado de Resultados</h3>
                     <p className="text-slate-500 text-sm">Resumen de ingresos y egresos operativos.</p>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center">
+                <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
                     {/* Month Selector */}
-                    <div className="flex items-center bg-white rounded-xl border border-slate-200 p-1 shadow-sm">
+                    <div className="flex items-center justify-between bg-white rounded-xl border border-slate-200 p-1 shadow-sm">
                         <button
                             onClick={() => handleMonthChange('prev')}
                             className="p-2 hover:bg-slate-100 rounded-lg text-slate-600 transition-colors"
                         >
                             <ChevronLeft size={20} />
                         </button>
-                        <div className="px-6 text-slate-800 font-bold flex items-center gap-2 min-w-[200px] justify-center text-lg">
-                            <CalendarIcon size={18} className="text-emerald-500" />
+                        <div className="px-4 text-slate-800 font-bold flex items-center justify-center gap-2 min-w-[150px] text-sm md:text-lg">
+                            <CalendarIcon size={16} className="text-emerald-500" />
                             <span className="capitalize">{format(selectedMonth, 'MMMM yyyy', { locale: es })}</span>
                         </div>
                         <button
@@ -182,42 +182,44 @@ export function IncomeStatement() {
                         </button>
                     </div>
 
-                    <button
-                        onClick={() => {
-                            if (!transactions.length) return;
-                            const headers = ['Fecha', 'Tipo', 'Categoría', 'Descripción', 'Monto', 'Método'];
-                            const rows = transactions.map(t => [
-                                format(parseISO(t.date), 'yyyy-MM-dd'),
-                                t.type === 'income' ? 'Ingreso' : 'Egreso',
-                                t.category,
-                                `"${(t.description || '').replace(/"/g, '""')}"`,
-                                t.amount.toString(),
-                                t.paymentMethod || ''
-                            ]);
-                            const csvContent = [headers.join(','), ...rows.map(row => row.join(','))].join('\n');
-                            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-                            const url = URL.createObjectURL(blob);
-                            const link = document.createElement('a');
-                            link.href = url;
-                            link.download = `finanzas_${format(selectedMonth, 'yyyy_MM')}.csv`;
-                            document.body.appendChild(link);
-                            link.click();
-                            document.body.removeChild(link);
-                        }}
-                        className="flex items-center justify-center gap-2 px-4 py-3 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl font-bold shadow-sm transition-all active:scale-[0.98]"
-                        title="Exportar a Excel (CSV)"
-                    >
-                        <Download size={20} />
-                        <span className="hidden sm:inline">Exportar</span>
-                    </button>
+                    <div className="flex gap-2">
+                        <button
+                            onClick={() => {
+                                if (!transactions.length) return;
+                                const headers = ['Fecha', 'Tipo', 'Categoría', 'Descripción', 'Monto', 'Método'];
+                                const rows = transactions.map(t => [
+                                    format(parseISO(t.date), 'yyyy-MM-dd'),
+                                    t.type === 'income' ? 'Ingreso' : 'Egreso',
+                                    t.category,
+                                    `"${(t.description || '').replace(/"/g, '""')}"`,
+                                    t.amount.toString(),
+                                    t.paymentMethod || ''
+                                ]);
+                                const csvContent = [headers.join(','), ...rows.map(row => row.join(','))].join('\n');
+                                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                                const url = URL.createObjectURL(blob);
+                                const link = document.createElement('a');
+                                link.href = url;
+                                link.download = `finanzas_${format(selectedMonth, 'yyyy_MM')}.csv`;
+                                document.body.appendChild(link);
+                                link.click();
+                                document.body.removeChild(link);
+                            }}
+                            className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-3 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl font-bold shadow-sm transition-all active:scale-[0.98]"
+                            title="Exportar a Excel (CSV)"
+                        >
+                            <Download size={20} />
+                            <span className="hidden sm:inline">Exportar</span>
+                        </button>
 
-                    <button
-                        onClick={openCreateModal}
-                        className="flex items-center justify-center gap-2 px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold shadow-lg shadow-slate-900/20 transition-all active:scale-[0.98]"
-                    >
-                        <Plus size={20} />
-                        <span>Registrar</span>
-                    </button>
+                        <button
+                            onClick={openCreateModal}
+                            className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold shadow-lg shadow-slate-900/20 transition-all active:scale-[0.98]"
+                        >
+                            <Plus size={20} />
+                            <span>Registrar</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -280,9 +282,9 @@ export function IncomeStatement() {
                     {transactions.length > 0 ? (
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                             {/* Income Breakdown */}
-                            <Card title="Fuentes de Ingreso" description="Desglose por categoría" className="lg:col-span-1 min-h-[400px]">
+                            <Card title="Fuentes de Ingreso" description="Desglose por categoría" className="lg:col-span-1 min-h-[300px] md:min-h-[400px]">
                                 {incomeByCat.length > 0 ? (
-                                    <div className="h-[300px] w-full">
+                                    <div className="h-[250px] md:h-[300px] w-full">
                                         <ResponsiveContainer width="100%" height="100%">
                                             <PieChart>
                                                 <Pie

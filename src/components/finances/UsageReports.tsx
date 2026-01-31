@@ -47,7 +47,7 @@ export function UsageReports() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     {/* Coach Usage */}
                     <Card title="Clases por Entrenador" description="Volumen de reservaciones">
-                        <div className="h-[300px] w-full mt-4">
+                        <div className="h-[250px] md:h-[300px] w-full mt-4">
                             <ResponsiveContainer width="100%" height="100%">
                                 <BarChart data={data.byCoach} layout="vertical" margin={{ left: 20 }}>
                                     <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e2e8f0" />

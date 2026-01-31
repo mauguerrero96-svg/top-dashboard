@@ -311,25 +311,25 @@ export default function BookingsPage() {
                 initialData={editingBooking}
             />
 
-            <div className="flex justify-between items-center shrink-0">
+            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 shrink-0">
                 <div>
-                    <h1 className="text-3xl font-bold text-slate-800 mb-1">Calendario Diario</h1>
+                    <h1 className="text-2xl md:text-3xl font-bold text-slate-800 mb-1">Calendario Diario</h1>
                     <div className="flex items-center gap-2">
-                        <p className="text-slate-500">Gestión de reservas (Drag & Drop para mover).</p>
+                        <p className="text-sm text-slate-500">Gestión de reservas (Drag & Drop para mover).</p>
                         {loading && <Loader2 size={16} className="text-indigo-600 animate-spin" />}
                     </div>
                 </div>
 
-                <div className="flex items-center gap-4">
-                    <div className="flex items-center bg-white rounded-lg border border-slate-200 p-1 shadow-sm">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto">
+                    <div className="flex items-center justify-between bg-white rounded-lg border border-slate-200 p-1 shadow-sm">
                         <button
                             onClick={() => setSelectedDate(addDays(selectedDate, -1))}
                             className="p-2 hover:bg-slate-100 rounded-md text-slate-600 transition-colors"
                         >
                             <ChevronLeft size={20} />
                         </button>
-                        <div className="px-6 text-slate-800 font-medium flex items-center gap-2 min-w-[200px] justify-center text-lg">
-                            <CalendarIcon size={18} className="text-orange-500" />
+                        <div className="px-4 text-slate-800 font-medium flex items-center justify-center gap-2 min-w-[160px] text-sm md:text-lg">
+                            <CalendarIcon size={16} className="text-orange-500" />
                             <span className="capitalize">{format(selectedDate, 'EEEE, d MMM', { locale: es })}</span>
                         </div>
                         <button
@@ -340,7 +340,7 @@ export default function BookingsPage() {
                         </button>
                     </div>
 
-                    <button className="bg-orange-500 text-white px-4 py-2.5 rounded-lg hover:bg-orange-600 transition-colors font-medium shadow-lg shadow-orange-500/20">
+                    <button className="bg-orange-500 text-white px-4 py-2.5 rounded-lg hover:bg-orange-600 transition-colors font-medium shadow-lg shadow-orange-500/20 text-sm whitespace-nowrap">
                         + Reserva Rápida
                     </button>
                 </div>

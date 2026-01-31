@@ -12,7 +12,7 @@ interface CardProps {
 export function Card({ children, className, title, description, action }: CardProps) {
     return (
         <div className={clsx(
-            'bg-white rounded-[32px] border-none shadow-xl shadow-slate-200/50 p-8 flex flex-col relative overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-lime-500/10 hover:-translate-y-1',
+            'bg-white rounded-2xl md:rounded-[32px] border-none shadow-xl shadow-slate-200/50 p-5 md:p-8 flex flex-col relative overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-lime-500/10 hover:-translate-y-1',
             className
         )}>
             {(title || action) && (
