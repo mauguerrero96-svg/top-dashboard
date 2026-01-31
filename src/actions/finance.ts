@@ -1,6 +1,6 @@
 'use server';
 
-import { createClient } from '@/utils/supabase/server';
+import { supabaseServer } from '@/lib/supabaseServer';
 import { revalidatePath } from 'next/cache';
 
 export interface TransactionData {
@@ -13,7 +13,7 @@ export interface TransactionData {
 }
 
 export async function addTransaction(data: TransactionData) {
-    const supabase = await createClient();
+    const supabase = supabaseServer;
 
     // 1. Insert Transaction
     const { error } = await supabase
@@ -68,7 +68,7 @@ export async function addTransaction(data: TransactionData) {
 }
 
 export async function payInvoice(invoiceId: string) {
-    const supabase = await createClient();
+    const supabase = supabaseServer;
 
     // 1. Get Invoice Details
     const { data: invoice, error: fetchError } = await supabase
@@ -122,7 +122,7 @@ export async function payInvoice(invoiceId: string) {
 }
 
 export async function updateInvoice(invoice: { id: string, amount: number, description: string, date: string, status: 'Paid' | 'Pending' | 'Overdue', serial_id: string }) {
-    const supabase = await createClient();
+    const supabase = supabaseServer;
 
     // 1. Update Invoice
     const { error: invError } = await supabase
