@@ -1,4 +1,4 @@
-import { Booking, BOOKINGS } from './mockData';
+import { Booking } from '@/types/bookings';
 import { parseISO, differenceInMinutes, isWithinInterval, startOfDay, endOfDay } from 'date-fns';
 
 export const HOURLY_RATE = 20;
@@ -36,12 +36,13 @@ export function calculateBookingPrice(
  * Checks if a time slot is available for a specific court.
  */
 export function isCourtAvailable(
+    bookings: Booking[],
     courtId: string,
     startTime: Date,
     endTime: Date,
     excludeBookingId?: string
 ): boolean {
-    const conflictingBooking = BOOKINGS.find(b => {
+    const conflictingBooking = bookings.find(b => {
         if (b.courtId !== courtId) return false;
         if (b.status === 'Cancelled') return false;
         if (excludeBookingId && b.id === excludeBookingId) return false;
@@ -60,11 +61,12 @@ export function isCourtAvailable(
  * calculates earnings per court within a date range.
  */
 export function getCourtEarnings(
+    bookings: Booking[],
     courtId: string,
     startDate: Date,
     endDate: Date
 ) {
-    const relevantBookings = BOOKINGS.filter(b => {
+    const relevantBookings = bookings.filter(b => {
         if (b.courtId !== courtId) return false;
         if (b.status !== 'Confirmed') return false;
         const bStart = parseISO(b.startTime);

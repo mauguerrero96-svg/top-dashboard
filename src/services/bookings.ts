@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase';
-import { Booking, Coach } from '@/lib/mockData';
+import { Booking, Coach, Court } from '@/types/bookings';
 
 export const bookingsService = {
     /**
@@ -22,6 +22,16 @@ export const bookingsService = {
         }));
     },
 
+    async getCourts(): Promise<Court[]> {
+        // Fallback since table might not exist
+        return [
+            { id: 'c1', name: 'Court 1 (Central)', type: 'Clay' },
+            { id: 'c2', name: 'Court 2', type: 'Clay' },
+            { id: 'c3', name: 'Court 3', type: 'Hard' },
+            { id: 'c4', name: 'Court 4', type: 'Hard' },
+        ];
+    },
+
     /**
      * Fetch bookings for a specific date range
      */
@@ -30,10 +40,10 @@ export const bookingsService = {
             .from('bookings')
             .select(`
                 *,
-                player:player_id(name),
-                coach:coach_id(name),
+                player:dashboard_players!player_id(name),
+                coach:coaches!coach_id(name),
                 participants:booking_participants(
-                    player:player_id(name)
+                    player:dashboard_players!player_id(name)
                 )
             `)
             .gte('start_time', start.toISOString())

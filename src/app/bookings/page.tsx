@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Card } from '@/components/ui/Card';
-import { COURTS, Booking, Coach } from '@/lib/mockData'; // Keeping COACHES constants for now
+import { Booking, Coach, Court } from '@/types/bookings';
 import { bookingsService } from '@/services/bookings';
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock, User, Plus, Loader2 } from 'lucide-react';
 import { format, addDays, isSameDay, parseISO, getHours, getMinutes, differenceInMinutes, startOfDay, endOfDay } from 'date-fns';
@@ -19,6 +19,7 @@ const SLOT_HEIGHT = 80; // px per hour
 export default function BookingsPage() {
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [bookings, setBookings] = useState<Booking[]>([]);
+    const [courts, setCourts] = useState<Court[]>([]);
     const [players, setPlayers] = useState<DashboardPlayer[]>([]);
     const [coaches, setCoaches] = useState<Coach[]>([]);
     const [loading, setLoading] = useState(true);
@@ -27,21 +28,23 @@ export default function BookingsPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [newBookingData, setNewBookingData] = useState({ startTime: '', courtName: '' });
 
-    // Fetch Bookings & Players & Coaches
+    // Fetch Bookings & Players & Coaches & Courts
     const fetchData = useCallback(async () => {
         setLoading(true);
         const start = startOfDay(selectedDate);
         const end = endOfDay(selectedDate);
 
-        const [bookingsData, playersData, coachesData] = await Promise.all([
+        const [bookingsData, playersData, coachesData, courtsData] = await Promise.all([
             bookingsService.getBookings(start, end),
             dashboardService.getPlayers(),
-            bookingsService.getCoaches()
+            bookingsService.getCoaches(),
+            bookingsService.getCourts()
         ]);
 
         setBookings(bookingsData);
         setPlayers(playersData);
         setCoaches(coachesData);
+        setCourts(courtsData);
         setLoading(false);
     }, [selectedDate]);
 
@@ -56,7 +59,7 @@ export default function BookingsPage() {
         e.stopPropagation();
         setNewBookingData({
             startTime: format(parseISO(booking.startTime), 'HH:mm'),
-            courtName: COURTS.find(c => c.id === booking.courtId)?.name || ''
+            courtName: courts.find(c => c.id === booking.courtId)?.name || ''
         });
         // Pass full booking data to modal
         // We need to reconstruct the object expected by the modal
@@ -78,7 +81,7 @@ export default function BookingsPage() {
     };
 
     const handleCreateBooking = async (bookingDetails: any) => {
-        const court = COURTS.find(c => c.name === newBookingData.courtName);
+        const court = courts.find(c => c.name === newBookingData.courtName);
         if (!court) return;
 
         // Create ISO times for the new booking
@@ -352,13 +355,13 @@ export default function BookingsPage() {
 
                         {/* Header: Courts */}
                         <div className="flex border-b border-slate-200 bg-slate-50 shrink-0 sticky top-0 z-20">
-                            <div className="w-16 shrink-0 border-r border-slate-200 p-4 font-bold text-slate-400 flex items-center justify-center">
+                            <div className="w-16 shrink-0 border-r border-slate-200 font-bold text-slate-400 flex items-center justify-center sticky left-0 z-30 bg-slate-50">
                                 <Clock size={20} />
                             </div>
                             <div className="flex-1 grid grid-cols-4">
-                                {COURTS.map(court => (
-                                    <div key={court.id} className="p-3 text-center border-r border-slate-200 last:border-0 relative">
-                                        <div className="font-bold text-slate-800 text-base">{court.name}</div>
+                                {courts.map(court => (
+                                    <div key={court.id} className="p-3 text-center border-r border-slate-200 last:border-0 relative min-w-[120px]">
+                                        <div className="font-bold text-slate-800 text-base truncate">{court.name}</div>
                                         <div className="text-xs text-slate-500 uppercase tracking-wider">{court.type}</div>
                                     </div>
                                 ))}
@@ -386,7 +389,7 @@ export default function BookingsPage() {
                                         backgroundSize: `100% ${SLOT_HEIGHT}px`
                                     }}>
 
-                                    {COURTS.map(court => (
+                                    {courts.map(court => (
                                         <div key={court.id} className="border-r border-slate-100 last:border-0 relative h-full group/court">
                                             {/* Empty Slot Interactions (Hover & Dash Indicator) */}
                                             {hours.map(hour => {

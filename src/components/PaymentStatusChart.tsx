@@ -1,12 +1,12 @@
 'use client';
 
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
-import { INVOICES } from '@/lib/mockData';
+import { Invoice } from '@/types/bookings';
 
-export function PaymentStatusChart() {
-    const paid = INVOICES.filter(i => i.status === 'Paid').reduce((sum, i) => sum + i.amount, 0);
-    const pending = INVOICES.filter(i => i.status === 'Pending').reduce((sum, i) => sum + i.amount, 0);
-    const overdue = INVOICES.filter(i => i.status === 'Overdue').reduce((sum, i) => sum + i.amount, 0);
+export function PaymentStatusChart({ invoices = [] }: { invoices: Invoice[] }) {
+    const paid = invoices.filter(i => i.status === 'Paid').reduce((sum, i) => sum + i.amount, 0);
+    const pending = invoices.filter(i => i.status === 'Pending').reduce((sum, i) => sum + i.amount, 0);
+    const overdue = invoices.filter(i => i.status === 'Overdue').reduce((sum, i) => sum + i.amount, 0);
 
     const data = [
         { name: 'Pagado', value: paid, color: '#22c55e' }, // green-500

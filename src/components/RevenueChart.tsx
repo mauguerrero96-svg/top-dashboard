@@ -1,11 +1,11 @@
 'use client';
 
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
-import { INVOICES } from '@/lib/mockData';
+import { Invoice } from '@/types/bookings';
 import { format, parseISO, startOfMonth, eachDayOfInterval, endOfMonth } from 'date-fns';
 import { es } from 'date-fns/locale';
 
-export function RevenueChart() {
+export function RevenueChart({ invoices = [] }: { invoices: Invoice[] }) {
     // Generate data for the current month
     const start = startOfMonth(new Date());
     const end = endOfMonth(new Date());
@@ -14,7 +14,7 @@ export function RevenueChart() {
     // Aggregate revenue by day
     const data = days.map(day => {
         const dateStr = format(day, 'yyyy-MM-dd');
-        const revenue = INVOICES
+        const revenue = invoices
             .filter(inv => inv.status === 'Paid' && inv.date === dateStr)
             .reduce((sum, inv) => sum + inv.amount, 0);
 
