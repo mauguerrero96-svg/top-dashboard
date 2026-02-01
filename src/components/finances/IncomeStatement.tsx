@@ -370,7 +370,7 @@ export function IncomeStatement() {
                                         </div>
                                         {/* Cost List */}
                                         <div className="flex flex-col justify-center gap-3 pr-4">
-                                            {expenseByCat.sort((a, b) => b.value - a.value).map((cat, idx) => (
+                                            {([...expenseByCat].sort((a, b) => b.value - a.value)).map((cat, idx) => (
                                                 <div key={cat.name} className="flex justify-between items-center p-3 rounded-2xl bg-slate-50 border border-slate-100/50">
                                                     <div className="flex items-center gap-3">
                                                         <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS.expense[idx % COLORS.expense.length] }} />
